@@ -3,7 +3,7 @@
 ## Notes: Collects minimap buttons into a dock that you move and configure with Blizzard's Edit Mode.
 ## Category: Map & Minimap
 ## Author: Pa_nts
-## Version: 1.0.0
+## Version: 1.1.0
 ## IconTexture: Interface\Icons\INV_Misc_Bag_08
 ## OptionalDeps: Blizzard_EditMode
 ## SavedVariables: ButtonBayDB
