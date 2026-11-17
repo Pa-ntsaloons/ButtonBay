@@ -36,6 +36,25 @@ for _, direction in ipairs(ns.DIRECTIONS) do
   DIRECTION_BY_KEY[direction.key] = direction
 end
 
+-- How icons fill the panel, independent of which way the panel opens.
+-- "auto" fills away from the dock button, following Direction.
+ns.FILL_ORDERS = {
+  { key = "auto",      label = "Match direction" },
+  { key = "rightdown", primary = "right", secondary = "down",  label = "Left-right, top-down" },
+  { key = "rightup",   primary = "right", secondary = "up",    label = "Left-right, bottom-up" },
+  { key = "leftdown",  primary = "left",  secondary = "down",  label = "Right-left, top-down" },
+  { key = "leftup",    primary = "left",  secondary = "up",    label = "Right-left, bottom-up" },
+  { key = "downright", primary = "down",  secondary = "right", label = "Top-down, left-right" },
+  { key = "downleft",  primary = "down",  secondary = "left",  label = "Top-down, right-left" },
+  { key = "upright",   primary = "up",    secondary = "right", label = "Bottom-up, left-right" },
+  { key = "upleft",    primary = "up",    secondary = "left",  label = "Bottom-up, right-left" },
+}
+
+local FILL_BY_KEY = {}
+for _, fill in ipairs(ns.FILL_ORDERS) do
+  FILL_BY_KEY[fill.key] = fill
+end
+
 -- inset = how far the border reaches inward; icons are padded past it.
 ns.BORDER_STYLES = {
   { key = "tooltip", label = "Tooltip", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 14, inset = 3 },
@@ -84,8 +103,6 @@ main:SetPoint("CENTER")
 -- of the logo instead of sitting on top of it.
 local LOGO_TILE = 9
 local LOGO_GAP = 3
-local LOGO_COLOR_CLOSED = { 1, 0.82, 0, 1 }
-local LOGO_COLOR_OPEN = { 1, 1, 1, 1 }
 
 local logo = CreateFrame("Frame", nil, main)
 logo:SetSize(LOGO_TILE * 2 + LOGO_GAP, LOGO_TILE * 2 + LOGO_GAP)
@@ -114,12 +131,15 @@ local function setLogoCount(count)
   end
 end
 
+-- Tile colors come from the layout (Edit Mode settings); the defaults are
+-- used until the saved variables are loaded.
 local function colorLogo(open)
-  local color = open and LOGO_COLOR_OPEN or LOGO_COLOR_CLOSED
+  local settings = ns.layout or ns.LAYOUT_DEFAULTS
+  local c = open and settings.logoOpenColor or settings.logoColor
   for _, tile in ipairs(logoTiles) do
-    tile:SetColorTexture(unpack(color))
+    tile:SetColorTexture(c.r, c.g, c.b, c.a)
   end
-  countText:SetTextColor(unpack(color))
+  countText:SetTextColor(c.r, c.g, c.b, c.a)
 end
 colorLogo(false)
 
@@ -163,6 +183,7 @@ function Dock:ApplyAppearance()
       frame:SetBackdropBorderColor(edge.r, edge.g, edge.b, edge.a)
     end
   end
+  colorLogo(container:IsShown())
 end
 
 --------------------------------------------------------------------------------
@@ -327,7 +348,12 @@ function Dock:UpdateLayout()
 
   local direction = DIRECTION_BY_KEY[settings.direction] or DIRECTION_BY_KEY.leftdown
   local p = VECTORS[direction.primary]
-  local q = VECTORS[direction.secondary]
+  local fill = FILL_BY_KEY[settings.fillOrder]
+  if not fill or not fill.primary then
+    fill = direction
+  end
+  local fp = VECTORS[fill.primary]
+  local fq = VECTORS[fill.secondary]
   local perRow = math.max(1, settings.perRow)
   local padding = currentBorder().inset + 3
 
@@ -351,18 +377,22 @@ function Dock:UpdateLayout()
   local alongPrimary = padding * 2 + columns * cell + (columns - 1) * GAP
   local alongSecondary = padding * 2 + rows * cell + (rows - 1) * GAP
 
-  if p[1] ~= 0 then
+  -- "Per row" counts along the fill order's first direction, so a vertical
+  -- fill makes columns instead of rows.
+  if fp[1] ~= 0 then
     container:SetSize(alongPrimary, alongSecondary)
   else
     container:SetSize(alongSecondary, alongPrimary)
   end
 
-  -- The panel corner touching the dock button; icons are laid out from there,
-  -- moving away from the dock button.
+  -- The panel corner touching the dock button.
   local origin = corner(OPPOSITE[direction.primary], OPPOSITE[direction.secondary])
   local mainPoint = corner(direction.primary, OPPOSITE[direction.secondary])
   container:ClearAllPoints()
   container:SetPoint(origin, main, mainPoint, p[1] * GAP, p[2] * GAP)
+
+  -- The panel corner where the first icon goes.
+  local start = corner(OPPOSITE[fill.primary], OPPOSITE[fill.secondary])
 
   for index, button in ipairs(shownButtons) do
     -- The icon being dragged follows the cursor instead of its slot.
@@ -372,8 +402,8 @@ function Dock:UpdateLayout()
       local a = padding + column * (cell + GAP) + cell / 2
       local b = padding + row * (cell + GAP) + cell / 2
       ClearAllPoints(button)
-      SetPoint(button, "CENTER", container, origin,
-        p[1] * a + q[1] * b, p[2] * a + q[2] * b)
+      SetPoint(button, "CENTER", container, start,
+        fp[1] * a + fq[1] * b, fp[2] * a + fq[2] * b)
     end
   end
 
@@ -578,13 +608,15 @@ end)
 --------------------------------------------------------------------------------
 
 local previewing = false
+-- Not saved: the dock always starts closed after a login or /reload.
+local isOpen = false
 
 local function updateVisibility()
-  container:SetShown(main:IsShown() and (previewing or ns.db.isOpen))
+  container:SetShown(main:IsShown() and (previewing or isOpen))
 end
 
 function Dock:SetOpen(open)
-  ns.db.isOpen = open and true or false
+  isOpen = open and true or false
   updateVisibility()
 end
 
@@ -701,7 +733,7 @@ end)
 
 ns.Listen("LOGIN", function()
   Dock:Refresh()
-  Dock:SetOpen(ns.db.isOpen)
+  Dock:SetOpen(false)
   if ns.db.hideCompartment then
     Dock:ApplyCompartmentVisibility()
   end

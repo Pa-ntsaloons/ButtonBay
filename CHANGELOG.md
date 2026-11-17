@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Logo colors: pick the tile color for the closed and open dock in Edit Mode (per layout).
+- Button order: choose how icons fill the dock (e.g. left to right, top to bottom) separately from which way the dock opens. "Match direction" keeps the old behavior.
+- The dock now always starts closed after a login or `/reload`.
+
 ## 1.0.0 – 2026-11-17
 
 First release.

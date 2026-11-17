@@ -68,7 +68,6 @@ local ACCOUNT_DEFAULTS = {
   showButtonCount = false,
   perCharacterOrder = true,
   hideCompartment = false,
-  isOpen = false,
   lastLayout = "Default",
   whitelist = {},
   blacklist = {},
@@ -84,12 +83,15 @@ local ACCOUNT_DEFAULTS = {
 -- "never moved", which puts it in the middle of the screen.
 ns.LAYOUT_DEFAULTS = {
   direction = "leftdown",
+  fillOrder = "auto",  -- see ns.FILL_ORDERS; "auto" follows direction
   perRow = 5,
   logoScale = 100,  -- the dock button you click
   dockScale = 100,  -- the panel and the icons in it
   borderStyle = "tooltip",
   backgroundColor = { r = 0, g = 0, b = 0, a = 0.85 },
   borderColor = { r = 0.6, g = 0.6, b = 0.6, a = 1 },
+  logoColor = { r = 1, g = 0.82, b = 0, a = 1 },  -- tiles while the dock is closed
+  logoOpenColor = { r = 1, g = 1, b = 1, a = 1 }, -- tiles while the dock is open
 }
 
 -- Older versions stored the sizes under different names, and had a separate
@@ -173,6 +175,7 @@ ns.On("ADDON_LOADED", function(loaded)
   end
   ns.db = ButtonBayDB
   fillDefaults(ns.db, ACCOUNT_DEFAULTS)
+  ns.db.isOpen = nil  -- older versions reopened the dock after a reload
 
   if type(ButtonBayCharDB) ~= "table" then
     ButtonBayCharDB = {}

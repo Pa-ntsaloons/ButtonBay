@@ -307,12 +307,23 @@ local seconds = function(value) return string.format("%.2fs", value) end
 local directionPicker = addRow("Direction", createChoicePicker(ns.DIRECTIONS,
   function() return ns.layout.direction end,
   function(key) setLayoutValue("direction", key) end))
+addTooltip(directionPicker, "Which way the dock opens from the logo.")
+local fillOrderPicker = addRow("Button order", createChoicePicker(ns.FILL_ORDERS,
+  function() return ns.layout.fillOrder end,
+  function(key) setLayoutValue("fillOrder", key) end))
+addTooltip(fillOrderPicker,
+  "How the icons fill the dock. \"Match direction\" starts next to the logo and fills away from it.")
 local perRowSlider = addRow("Buttons per row",
   createSlider(1, 12, 1, plain, function(v) setLayoutValue("perRow", v) end))
+addTooltip(perRowSlider, "When the button order goes top to bottom first, this is buttons per column.")
 local logoScaleSlider = addRow("Logo size",
   createSlider(50, 200, 5, percent, function(v) setLayoutValue("logoScale", v) end))
 local hideLogoCheck = addRow("Hide logo until hovered",
   createCheckbox(function(v) ns.db.hideLogoUntilHover = v end), 30)
+local logoColorSwatch = addRow("Logo color", createColorSwatch("logoColor"))
+addTooltip(logoColorSwatch, "Color of the logo's tiles while the dock is closed.")
+local logoOpenColorSwatch = addRow("Logo color (open)", createColorSwatch("logoOpenColor"))
+addTooltip(logoOpenColorSwatch, "Color of the logo's tiles while the dock is open.")
 addTooltip(hideLogoCheck,
   "The logo fades away until you mouse over it. It stays visible while the dock or these settings are open, and in Edit Mode.")
 local buttonCountCheck = addRow("Show button count",
@@ -392,8 +403,11 @@ function Dialog:Refresh()
   end
   layoutLabel:SetText("Layout: " .. tostring(ns.layoutName))
   directionPicker:Refresh()
+  fillOrderPicker:Refresh()
   perRowSlider:Refresh(ns.layout.perRow)
   logoScaleSlider:Refresh(ns.layout.logoScale)
+  logoColorSwatch:Refresh()
+  logoOpenColorSwatch:Refresh()
   hideLogoCheck:Refresh(ns.db.hideLogoUntilHover)
   buttonCountCheck:Refresh(ns.db.showButtonCount)
   perCharacterCheck:Refresh(ns.db.perCharacterOrder)
