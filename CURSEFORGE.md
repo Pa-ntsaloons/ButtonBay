@@ -9,8 +9,8 @@ You move and style the dock in **Blizzard's Edit Mode**, just like the rest of y
 - **Collects buttons automatically.** It picks up every LibDBIcon button plus anything that looks like a minimap button, including buttons that addons create after you log in.
 - **Edit Mode support.** Select *Button Bay* in Edit Mode to drag the dock and open its settings. It snaps to other Edit Mode frames and the center of the screen (hold **Shift** to place it freely). Settings are saved per Edit Mode layout, so each layout can have its own dock.
 - **Drag to reorder.** While the settings are open, drag icons in the dock to arrange them however you like. Each character keeps its own order, or you can share one order across all of them.
-- **Your layout:** 8 growth directions, buttons per row, and separate sizes for the logo and the dock.
-- **Your look:** border style, background and border colors, and opacity, down to fully transparent.
+- **Your layout:** 8 growth directions, your choice of button order (left to right, top to bottom, and so on), buttons per row, and separate sizes for the logo and the dock.
+- **Your look:** logo color, border style, background and border colors, and opacity, down to fully transparent.
 - **Button count (optional):** the logo can show how many buttons are in the dock.
 - **Extras:** close automatically when the mouse leaves, hide the logo until you hover it, and hide Blizzard's addon compartment button.
 

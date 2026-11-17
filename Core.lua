@@ -90,8 +90,7 @@ ns.LAYOUT_DEFAULTS = {
   borderStyle = "tooltip",
   backgroundColor = { r = 0, g = 0, b = 0, a = 0.85 },
   borderColor = { r = 0.6, g = 0.6, b = 0.6, a = 1 },
-  logoColor = { r = 1, g = 0.82, b = 0, a = 1 },  -- tiles while the dock is closed
-  logoOpenColor = { r = 1, g = 1, b = 1, a = 1 }, -- tiles while the dock is open
+  logoColor = { r = 1, g = 0.82, b = 0, a = 1 },
 }
 
 -- Older versions stored the sizes under different names, and had a separate

@@ -321,9 +321,7 @@ local logoScaleSlider = addRow("Logo size",
 local hideLogoCheck = addRow("Hide logo until hovered",
   createCheckbox(function(v) ns.db.hideLogoUntilHover = v end), 30)
 local logoColorSwatch = addRow("Logo color", createColorSwatch("logoColor"))
-addTooltip(logoColorSwatch, "Color of the logo's tiles while the dock is closed.")
-local logoOpenColorSwatch = addRow("Logo color (open)", createColorSwatch("logoOpenColor"))
-addTooltip(logoOpenColorSwatch, "Color of the logo's tiles while the dock is open.")
+addTooltip(logoColorSwatch, "Color of the logo's tiles.")
 addTooltip(hideLogoCheck,
   "The logo fades away until you mouse over it. It stays visible while the dock or these settings are open, and in Edit Mode.")
 local buttonCountCheck = addRow("Show button count",
@@ -407,7 +405,6 @@ function Dialog:Refresh()
   perRowSlider:Refresh(ns.layout.perRow)
   logoScaleSlider:Refresh(ns.layout.logoScale)
   logoColorSwatch:Refresh()
-  logoOpenColorSwatch:Refresh()
   hideLogoCheck:Refresh(ns.db.hideLogoUntilHover)
   buttonCountCheck:Refresh(ns.db.showButtonCount)
   perCharacterCheck:Refresh(ns.db.perCharacterOrder)

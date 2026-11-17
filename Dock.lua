@@ -133,15 +133,16 @@ end
 
 -- Tile colors come from the layout (Edit Mode settings); the defaults are
 -- used until the saved variables are loaded.
-local function colorLogo(open)
+-- The logo keeps one color whether the dock is open or closed.
+local function refreshLogo()
   local settings = ns.layout or ns.LAYOUT_DEFAULTS
-  local c = open and settings.logoOpenColor or settings.logoColor
+  local c = settings.logoColor
   for _, tile in ipairs(logoTiles) do
     tile:SetColorTexture(c.r, c.g, c.b, c.a)
   end
   countText:SetTextColor(c.r, c.g, c.b, c.a)
 end
-colorLogo(false)
+refreshLogo()
 
 local highlight = main:CreateTexture(nil, "HIGHLIGHT")
 highlight:SetPoint("TOPLEFT", 4, -4)
@@ -156,8 +157,6 @@ container:SetFrameLevel(main:GetFrameLevel() + 1)
 container:SetClampedToScreen(true)
 container:EnableMouse(true)
 container:Hide()
-container:SetScript("OnShow", function() colorLogo(true) end)
-container:SetScript("OnHide", function() colorLogo(false) end)
 
 Dock.main = main
 Dock.container = container
@@ -183,7 +182,7 @@ function Dock:ApplyAppearance()
       frame:SetBackdropBorderColor(edge.r, edge.g, edge.b, edge.a)
     end
   end
-  colorLogo(container:IsShown())
+  refreshLogo()
 end
 
 --------------------------------------------------------------------------------
