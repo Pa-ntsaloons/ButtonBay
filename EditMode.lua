@@ -389,17 +389,41 @@ resetOrderButton:SetScript("OnClick", function()
 end)
 addTooltip(resetOrderButton, "Put the icons back in alphabetical order.")
 
+-- Opens Blizzard's Edit Mode with the dock selected, so you can drag it.
+-- Only shown outside Edit Mode, on clients that have it.
+local editModeButton = CreateFrame("Button", nil, Dialog, "UIPanelButtonTemplate")
+editModeButton:SetSize(268, 22)
+editModeButton:SetPoint("TOP", Dialog, "TOP", 0, nextRowY - 38)
+editModeButton:SetText("Move in Edit Mode")
+editModeButton:SetScript("OnClick", function()
+  if InCombatLockdown() then
+    ns.Print("Edit Mode can't be opened in combat.")
+    return
+  end
+  EditMode.selectOnEnter = true
+  ShowUIPanel(EditModeManagerFrame)
+end)
+addTooltip(editModeButton, "Opens Edit Mode with the dock selected, so you can drag it where you want it.")
+
 local hint = Dialog:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-hint:SetPoint("TOP", Dialog, "TOP", 0, nextRowY - 42)
 hint:SetText("Drag icons in the dock to change their order.")
 
-Dialog:SetHeight(-nextRowY + 80)
+-- The dialog shrinks when the Edit Mode button is hidden.
+local function layoutFooter()
+  local extra = editModeButton:IsShown() and 28 or 0
+  hint:ClearAllPoints()
+  hint:SetPoint("TOP", Dialog, "TOP", 0, nextRowY - 42 - extra)
+  Dialog:SetHeight(-nextRowY + 80 + extra)
+end
+layoutFooter()
 
 function Dialog:Refresh()
   if not ns.layout then
     return
   end
   layoutLabel:SetText("Layout: " .. tostring(ns.layoutName))
+  editModeButton:SetShown(EditMode.supported == true and not EditMode.active)
+  layoutFooter()
   directionPicker:Refresh()
   fillOrderPicker:Refresh()
   perRowSlider:Refresh(ns.layout.perRow)
@@ -430,6 +454,7 @@ Dialog:SetScript("OnShow", function()
   ns.Dock:SetArranging(true)
 end)
 Dialog:SetScript("OnHide", function()
+  EditMode.selectOnEnter = false
   ns.Dock:SetArranging(false)
   ns.Dock:SetPreview(false)
 end)
@@ -695,6 +720,13 @@ local function onEditModeEnter()
   EditMode.active = true
   selection:Show()
   selection:ShowHighlighted()
+  -- Opened from the "Move in Edit Mode" button: select the dock right away.
+  if EditMode.selectOnEnter then
+    EditMode.selectOnEnter = false
+    EditMode:Select()
+  elseif Dialog:IsShown() then
+    Dialog:Refresh()  -- hides the "Move in Edit Mode" button
+  end
 end
 
 local function onEditModeExit()

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 – 2026-11-17
+
+- **Move in Edit Mode** button in the settings: opens Edit Mode with the dock selected, so you can drag it into place.
+
 ## 1.1.0 – 2026-11-17
 
 - **Logo color:** pick the color of the logo's tiles in Edit Mode (saved per layout). The logo keeps that color while the dock is open instead of turning white.
